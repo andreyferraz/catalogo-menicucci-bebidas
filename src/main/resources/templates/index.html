@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+
+<head>
+    <title>Home — Bebidas Menicucci</title>
+</head>
+
+<body th:replace="~{layout :: layout('Home — Bebidas Menicucci', ~{::homeContent})}">
+    <div th:fragment="homeContent">
+        <main>
+            <section class="hero" id="inicio">
+                <div class="container hero-grid">
+                    <div class="hero-content">
+                        <span class="eyebrow">Tradição, seleção e conveniência</span>
+                        <h1>Monte seu pedido de bebidas em poucos cliques.</h1>
+                        <p>
+                            Escolha os produtos no catálogo, adicione ao carrinho e envie o pedido diretamente pelo
+                            WhatsApp da Bebidas Menicucci.
+                        </p>
+                        <div class="hero-actions">
+                            <a class="primary-button" href="#produtos">Ver catálogo</a>
+                            <button class="secondary-button" id="heroCartBtn" type="button">Ver carrinho</button>
+                        </div>
+                        <div class="hero-badges">
+                            <span>🍷 Vinhos</span>
+                            <span>🍺 Cervejas</span>
+                            <span>🥃 Destilados</span>
+                            <span>🥤 Sem álcool</span>
+                        </div>
+                    </div>
+
+                    <div class="hero-card" aria-hidden="true">
+                        <img src="assets/logo-menicucci.png" alt="" />
+                        <div class="hero-card-info">
+                            <span>Pedido via WhatsApp</span>
+                            <strong>28 98807-9115</strong>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="features" id="como-funciona">
+                <div class="container features-grid">
+                    <article>
+                        <span>01</span>
+                        <h2>Escolha os produtos</h2>
+                        <p>Navegue pelas categorias e encontre os itens desejados.</p>
+                    </article>
+                    <article>
+                        <span>02</span>
+                        <h2>Adicione ao carrinho</h2>
+                        <p>O carrinho usa LocalStorage, então o pedido fica salvo no navegador.</p>
+                    </article>
+                    <article>
+                        <span>03</span>
+                        <h2>Envie pelo WhatsApp</h2>
+                        <p>Ao solicitar o pedido, a mensagem é montada automaticamente.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="catalog-section" id="produtos">
+                <div class="container">
+                    <div class="section-heading">
+                        <div>
+                            <span class="eyebrow">Catálogo</span>
+                            <h2>Produtos em destaque</h2>
+                        </div>
+                        <div class="search-box">
+                            <input id="searchInput" type="search" placeholder="Buscar produto..."
+                                aria-label="Buscar produto" />
+                        </div>
+                    </div>
+
+                    <div class="category-tabs" id="categoryTabs" aria-label="Categorias de produtos"></div>
+                    <div class="products-grid" id="productsGrid"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+
+</html>

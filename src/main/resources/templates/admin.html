@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+
+<head>
+    <title>Painel Admin — Bebidas Menicucci</title>
+</head>
+
+<body th:replace="~{layout :: layout('Painel Admin — Bebidas Menicucci', ~{::adminContent})}">
+    <div th:fragment="adminContent">
+        <main class="admin-page">
+            <section class="admin-hero">
+                <div class="container admin-hero-grid">
+                    <div>
+                        <span class="eyebrow">Painel administrativo</span>
+                        <h1>Gerencie produtos, senha e o WhatsApp do carrinho.</h1>
+                        <p>
+                            Use este painel para manter o catálogo atualizado e ajustar o número que o carrinho usa
+                            para enviar pedidos.
+                        </p>
+                    </div>
+                    <div class="admin-summary-card">
+                        <strong th:text="${#lists.size(produtos)}">0</strong>
+                        <span>produtos cadastrados</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="admin-content container">
+                <div class="admin-alert" th:if="${successMessage}" th:text="${successMessage}"></div>
+
+                <div class="admin-grid">
+                    <section class="admin-card">
+                        <div class="section-heading compact">
+                            <div>
+                                <span class="eyebrow">Conta</span>
+                                <h2>Alterar senha</h2>
+                            </div>
+                        </div>
+                        <form class="admin-form" th:action="@{/admin/senha}" method="post">
+                            <label for="senhaUsuarioId">ID do usuário</label>
+                            <input id="senhaUsuarioId" type="text" name="id" placeholder="UUID do usuário" required />
+
+                            <label for="novaSenha">Nova senha</label>
+                            <input id="novaSenha" type="password" name="novaSenha" placeholder="Digite a nova senha" required />
+
+                            <button class="primary-button" type="submit">Salvar senha</button>
+                        </form>
+                    </section>
+
+                    <section class="admin-card">
+                        <div class="section-heading compact">
+                            <div>
+                                <span class="eyebrow">Configuração</span>
+                                <h2>WhatsApp do carrinho</h2>
+                            </div>
+                        </div>
+                        <form class="admin-form" th:action="@{/admin/whatsapp}" method="post">
+                            <label for="whatsappNumber">Número atual</label>
+                            <input id="whatsappNumber" type="text" name="whatsappNumber" th:value="${whatsappNumber}" placeholder="5528988079115" required />
+                            <small>Use apenas números com DDI e DDD. Ex.: 5528988079115</small>
+                            <button class="primary-button" type="submit">Atualizar número</button>
+                        </form>
+                    </section>
+                </div>
+
+                <section class="admin-card">
+                    <div class="section-heading compact">
+                        <div>
+                            <span class="eyebrow">Produtos</span>
+                            <h2>Cadastrar ou editar produto</h2>
+                        </div>
+                    </div>
+                    <form class="admin-form admin-product-form" th:action="@{/admin/produto/salvar}" method="post" enctype="multipart/form-data" th:object="${produtoForm}">
+                        <input type="hidden" th:field="*{id}" />
+
+                        <div class="form-grid">
+                            <div>
+                                <label for="nome">Nome</label>
+                                <input id="nome" type="text" th:field="*{nome}" placeholder="Nome do produto" required />
+                            </div>
+                            <div>
+                                <label for="categoria">Categoria</label>
+                                <input id="categoria" type="text" th:field="*{categoria}" placeholder="Ex.: Vinhos" required />
+                            </div>
+                            <div>
+                                <label for="preco">Preço</label>
+                                <input id="preco" type="number" th:field="*{preco}" step="0.01" min="0" placeholder="0.00" required />
+                            </div>
+                            <div class="form-span-2">
+                                <label for="imagem">Imagem</label>
+                                <input id="imagem" type="file" name="imagem" accept="image/*" />
+                            </div>
+                            <div class="form-span-2">
+                                <label for="descricao">Descrição</label>
+                                <textarea id="descricao" th:field="*{descricao}" rows="4" placeholder="Descrição do produto"></textarea>
+                            </div>
+                        </div>
+
+                        <button class="primary-button" type="submit">Salvar produto</button>
+                    </form>
+                </section>
+
+                <section class="admin-card">
+                    <div class="section-heading compact">
+                        <div>
+                            <span class="eyebrow">Catálogo</span>
+                            <h2>Produtos cadastrados</h2>
+                        </div>
+                    </div>
+                    <div class="admin-table">
+                        <article class="admin-table-row admin-table-head">
+                            <span>Produto</span>
+                            <span>Categoria</span>
+                            <span>Preço</span>
+                            <span>Ações</span>
+                        </article>
+                        <article class="admin-table-row" th:each="produto : ${produtos}">
+                            <span>
+                                <strong th:text="${produto.nome}">Nome</strong>
+                                <small th:text="${produto.descricao}">Descrição</small>
+                            </span>
+                            <span th:text="${produto.categoria}">Categoria</span>
+                            <span th:text="${#numbers.formatCurrency(produto.preco)}">R$ 0,00</span>
+                            <span class="admin-actions">
+                                <button class="ghost-button" type="button"
+                                    th:attr="data-edit-id=${produto.id},data-edit-nome=${produto.nome},data-edit-descricao=${produto.descricao},data-edit-categoria=${produto.categoria},data-edit-preco=${produto.preco}">
+                                    Editar
+                                </button>
+                                <form th:action="@{/admin/produto/excluir}" method="post">
+                                    <input type="hidden" name="id" th:value="${produto.id}" />
+                                    <button class="remove-button" type="submit">Excluir</button>
+                                </form>
+                            </span>
+                        </article>
+                    </div>
+                </section>
+            </section>
+        </main>
+
+        <script>
+            document.querySelectorAll('[data-edit-id]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    document.querySelector('input[name="id"]').value = button.dataset.editId || '';
+                    document.querySelector('input[name="nome"]').value = button.dataset.editNome || '';
+                    document.querySelector('input[name="categoria"]').value = button.dataset.editCategoria || '';
+                    document.querySelector('input[name="preco"]').value = button.dataset.editPreco || '';
+                    document.querySelector('textarea[name="descricao"]').value = button.dataset.editDescricao || '';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+        </script>
+    </div>
+</body>
+
+</html>
