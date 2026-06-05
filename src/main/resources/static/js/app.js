@@ -1,6 +1,7 @@
 const WHATSAPP_NUMBER = document.body.dataset.whatsappNumber || window.CATALOGO_WHATSAPP || "5528988079115";
 const CART_STORAGE_KEY = "bebidas-menicucci-cart";
 const CUSTOMER_STORAGE_KEY = "bebidas-menicucci-customer";
+const PRODUCTS_PER_PAGE = 16;
 
 const products = (window.CATALOGO_PRODUCTS || []).map((product) => ({
   id: product.id,
@@ -14,6 +15,7 @@ const products = (window.CATALOGO_PRODUCTS || []).map((product) => ({
 
 let selectedCategory = "Todos";
 let searchTerm = "";
+let currentProductsPage = 1;
 let cart = loadCart();
 
 const formatCurrency = (value) => value.toLocaleString("pt-BR", {
@@ -152,17 +154,17 @@ function renderCategories() {
   tabs.querySelectorAll("button").forEach((button) => {
     button.addEventListener("click", () => {
       selectedCategory = button.dataset.category;
+      currentProductsPage = 1;
       renderCategories();
       renderProducts();
     });
   });
 }
 
-function renderProducts() {
-  const productsGrid = document.getElementById("productsGrid");
+function getFilteredProducts() {
   const normalizedSearch = searchTerm.trim().toLowerCase();
 
-  const filteredProducts = products.filter((product) => {
+  return products.filter((product) => {
     const matchesCategory = selectedCategory === "Todos" || product.category === selectedCategory;
     const matchesSearch = !normalizedSearch
       || product.name.toLowerCase().includes(normalizedSearch)
@@ -171,13 +173,74 @@ function renderProducts() {
 
     return matchesCategory && matchesSearch;
   });
+}
 
-  if (!filteredProducts.length) {
-    productsGrid.innerHTML = `<div class="empty-cart">Nenhum produto encontrado.</div>`;
+function renderProductsPagination(totalProducts) {
+  const pagination = document.getElementById("productsPagination");
+  const totalPages = Math.max(1, Math.ceil(totalProducts / PRODUCTS_PER_PAGE));
+
+  if (totalProducts <= PRODUCTS_PER_PAGE) {
+    pagination.innerHTML = "";
+    pagination.hidden = true;
     return;
   }
 
-  productsGrid.innerHTML = filteredProducts.map((product) => `
+  currentProductsPage = Math.min(currentProductsPage, totalPages);
+  pagination.hidden = false;
+
+  pagination.innerHTML = `
+    <button type="button" class="pagination-button" data-page-nav="prev" ${currentProductsPage === 1 ? "disabled" : ""}>
+      Anterior
+    </button>
+    <div class="pagination-pages">
+      ${Array.from({ length: totalPages }, (_, index) => {
+        const page = index + 1;
+        return `<button type="button" class="pagination-page ${page === currentProductsPage ? "active" : ""}" data-page-number="${page}">${page}</button>`;
+      }).join("")}
+    </div>
+    <button type="button" class="pagination-button" data-page-nav="next" ${currentProductsPage === totalPages ? "disabled" : ""}>
+      Próxima
+    </button>
+  `;
+
+  pagination.querySelectorAll("[data-page-number]").forEach((button) => {
+    button.addEventListener("click", () => {
+      currentProductsPage = Number(button.dataset.pageNumber);
+      renderProducts();
+    });
+  });
+
+  pagination.querySelectorAll("[data-page-nav]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const direction = button.dataset.pageNav;
+      if (direction === "prev" && currentProductsPage > 1) {
+        currentProductsPage -= 1;
+      }
+      if (direction === "next" && currentProductsPage < totalPages) {
+        currentProductsPage += 1;
+      }
+      renderProducts();
+    });
+  });
+}
+
+function renderProducts() {
+  const productsGrid = document.getElementById("productsGrid");
+  const filteredProducts = getFilteredProducts();
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE));
+  const safePage = Math.min(currentProductsPage, totalPages);
+  const startIndex = (safePage - 1) * PRODUCTS_PER_PAGE;
+  const visibleProducts = filteredProducts.slice(startIndex, startIndex + PRODUCTS_PER_PAGE);
+
+  currentProductsPage = safePage;
+
+  if (!filteredProducts.length) {
+    productsGrid.innerHTML = `<div class="empty-cart">Nenhum produto encontrado.</div>`;
+    renderProductsPagination(0);
+    return;
+  }
+
+  productsGrid.innerHTML = visibleProducts.map((product) => `
     <article class="product-card">
       <div class="product-image">
         ${product.imageUrl
@@ -199,6 +262,8 @@ function renderProducts() {
   productsGrid.querySelectorAll("[data-add-product]").forEach((button) => {
     button.addEventListener("click", () => addToCart(button.dataset.addProduct));
   });
+
+  renderProductsPagination(filteredProducts.length);
 }
 
 function updateCartUI() {
@@ -302,6 +367,7 @@ function init() {
 
   document.getElementById("searchInput").addEventListener("input", (event) => {
     searchTerm = event.target.value;
+    currentProductsPage = 1;
     renderProducts();
   });
 

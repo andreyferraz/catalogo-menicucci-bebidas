@@ -177,6 +177,34 @@ button { cursor: pointer; }
 .price { color: var(--green-900); font-size: 20px; font-weight: 900; }
 .add-button { border: 0; border-radius: 14px; padding: 11px 13px; color: var(--cream-100); background: var(--wine-800); font-weight: 900; }
 
+.products-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 28px;
+}
+.pagination-pages { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.pagination-button,
+.pagination-page {
+  border: 1px solid rgba(154, 100, 25, .24);
+  border-radius: 999px;
+  padding: 11px 16px;
+  background: #fff;
+  color: var(--wine-800);
+  font-weight: 900;
+}
+.pagination-page.active {
+  color: var(--cream-100);
+  background: var(--green-900);
+  border-color: var(--green-900);
+}
+.pagination-button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
 .cart-drawer { position: fixed; inset: 0; z-index: 50; pointer-events: none; }
 .cart-drawer.open { pointer-events: auto; }
 .drawer-overlay { position: absolute; inset: 0; background: rgba(33,7,7,.48); opacity: 0; transition: opacity .25s ease; }
