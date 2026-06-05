@@ -38,3 +38,5 @@ src/main/resources/application-*.properties
 
 ### Banco local ###
 menicucci.db
+
+.DS_Store
