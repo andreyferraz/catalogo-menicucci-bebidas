@@ -35,6 +35,9 @@ public class Produto implements Persistable<UUID> {
     @Column("preco")
     private BigDecimal preco;
 
+    @Column("imagem_url")
+    private String imagemUrl;
+
     @Transient
     private boolean isNew = false;
 
