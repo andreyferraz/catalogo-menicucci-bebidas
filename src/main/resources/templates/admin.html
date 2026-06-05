@@ -8,28 +8,43 @@
 <body th:replace="~{layout :: layout('Painel Admin — Bebidas Menicucci', ~{::adminContent})}">
     <div th:fragment="adminContent">
         <main class="admin-page">
-            <section class="admin-hero">
-                <div class="container admin-hero-grid">
-                    <div>
+            <header class="admin-topbar">
+                <div class="container admin-topbar-inner">
+                    <div class="admin-brand-block">
                         <span class="eyebrow">Painel administrativo</span>
-                        <h1>Gerencie produtos, senha e o WhatsApp do carrinho.</h1>
-                        <p>
-                            Use este painel para manter o catálogo atualizado e ajustar o número que o carrinho usa
-                            para enviar pedidos.
-                        </p>
+                        <h1>Bebidas Menicucci</h1>
+                        <p>Gerencie produtos, senha e o WhatsApp do carrinho em um só lugar.</p>
                     </div>
-                    <div class="admin-summary-card">
-                        <strong th:text="${#lists.size(produtos)}">0</strong>
-                        <span>produtos cadastrados</span>
+
+                    <div class="admin-topbar-actions">
+                        <a class="ghost-button admin-link-button" th:href="@{/}">Ver catálogo</a>
+                        <form th:action="@{/logout}" method="post">
+                            <button class="secondary-button admin-logout-button" type="submit">Sair</button>
+                        </form>
                     </div>
                 </div>
-            </section>
+            </header>
 
             <section class="admin-content container">
                 <div class="admin-alert" th:if="${successMessage}" th:text="${successMessage}"></div>
 
-                <div class="admin-grid">
-                    <section class="admin-card">
+                <section class="admin-metrics">
+                    <article class="admin-summary-card">
+                        <strong th:text="${#lists.size(produtos)}">0</strong>
+                        <span>produtos cadastrados</span>
+                    </article>
+                    <article class="admin-summary-card admin-summary-card-soft">
+                        <strong th:text="${whatsappNumber}">5528988079115</strong>
+                        <span>WhatsApp do carrinho</span>
+                    </article>
+                    <article class="admin-summary-card admin-summary-card-dark">
+                        <strong>Login</strong>
+                        <span>acesso protegido por senha</span>
+                    </article>
+                </section>
+
+                <section class="admin-grid">
+                    <section class="admin-card admin-card-feature">
                         <div class="section-heading compact">
                             <div>
                                 <span class="eyebrow">Conta</span>
@@ -47,7 +62,7 @@
                         </form>
                     </section>
 
-                    <section class="admin-card">
+                    <section class="admin-card admin-card-feature">
                         <div class="section-heading compact">
                             <div>
                                 <span class="eyebrow">Configuração</span>
@@ -63,7 +78,7 @@
                     </section>
                 </div>
 
-                <section class="admin-card">
+                <section class="admin-card admin-card-form">
                     <div class="section-heading compact">
                         <div>
                             <span class="eyebrow">Produtos</span>
@@ -100,7 +115,7 @@
                     </form>
                 </section>
 
-                <section class="admin-card">
+                <section class="admin-card admin-card-table">
                     <div class="section-heading compact">
                         <div>
                             <span class="eyebrow">Catálogo</span>

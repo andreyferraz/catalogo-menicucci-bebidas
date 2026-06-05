@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import com.menicucci.catalogo.model.Usuario;
@@ -59,6 +60,7 @@ public class SecurityConfig {
                     .deleteCookies("JSESSIONID")
                     .permitAll()
                 )
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint(LOGIN_PATH)))
                 .rememberMe(Customizer.withDefaults());
 
             return http.build();
@@ -81,7 +83,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
-            return (request, response, authentication) -> response.sendRedirect("/");
+            return (request, response, authentication) -> response.sendRedirect("/admin");
     }
 
         private org.springframework.security.core.userdetails.UserDetails toUserDetails(Usuario usuario) {

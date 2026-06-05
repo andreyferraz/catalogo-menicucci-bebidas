@@ -91,7 +91,8 @@
       </div>
       <div class="footer-actions">
         <a href="https://wa.me/5528988079115" target="_blank" rel="noopener">WhatsApp: 28 98807-9115</a>
-        <a class="admin-login-button" th:href="@{/login}">🔐 Painel admin</a>
+        <a class="admin-login-button" th:href="@{/admin}" sec:authorize="isAuthenticated()">🔐 Painel admin</a>
+        <a class="admin-login-button" th:href="@{/login}" sec:authorize="!isAuthenticated()">🔐 Painel admin</a>
       </div>
     </div>
   </footer>
