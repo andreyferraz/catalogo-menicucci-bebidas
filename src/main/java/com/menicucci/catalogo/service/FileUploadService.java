@@ -93,8 +93,9 @@ public class FileUploadService {
      */
     public void removerArquivo(String nomeArquivo) {
         try {
-            if (nomeArquivo != null && !nomeArquivo.isEmpty()) {
-                Path caminhoArquivo = Paths.get(uploadDir, nomeArquivo);
+            String nomeNormalizado = normalizarNomeArquivo(nomeArquivo);
+            if (nomeNormalizado != null && !nomeNormalizado.isEmpty()) {
+                Path caminhoArquivo = Paths.get(uploadDir, nomeNormalizado);
                 Files.deleteIfExists(caminhoArquivo);
             }
         } catch (IOException e) {
@@ -124,6 +125,31 @@ public class FileUploadService {
      */
     public Path getCaminhoCompleto(String nomeArquivo) {
         return Paths.get(uploadDir, nomeArquivo);
+    }
+
+    private String normalizarNomeArquivo(String nomeArquivo) {
+        if (nomeArquivo == null) {
+            return null;
+        }
+
+        String valor = nomeArquivo.trim();
+        if (valor.isEmpty()) {
+            return valor;
+        }
+
+        if (valor.startsWith("/uploads/")) {
+            return valor.substring("/uploads/".length());
+        }
+
+        if (valor.startsWith("uploads/")) {
+            return valor.substring("uploads/".length());
+        }
+
+        if (valor.startsWith("/")) {
+            return valor.substring(1);
+        }
+
+        return valor;
     }
 
     private void converterESalvarWebp(MultipartFile imagemFile, Path caminhoArquivo) throws IOException {

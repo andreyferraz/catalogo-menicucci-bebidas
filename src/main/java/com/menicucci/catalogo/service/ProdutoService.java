@@ -75,7 +75,7 @@ public class ProdutoService {
 
         namedParameterJdbcTemplate.update(
                 "INSERT INTO produtos (id, nome, descricao, categoria, preco, imagem_url) " +
-                        "VALUES (:id, :nome, :descricao, :categoria, :preco, :imagemUrl)",
+                "VALUES (:id, :nome, :descricao, :categoria, :preco, :imagem_url)",
                 new MapSqlParameterSource()
                         .addValue(CAMPO_ID, Objects.requireNonNull(novo.getId(), MENSAGEM_ID_NAO_NULO).toString())
                         .addValue(CAMPO_NOME, novo.getNome())
