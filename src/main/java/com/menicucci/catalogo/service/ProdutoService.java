@@ -120,7 +120,7 @@ public class ProdutoService {
 
         namedParameterJdbcTemplate.update(
                 "UPDATE produtos SET nome = :nome, descricao = :descricao, categoria = :categoria, preco = :preco, " +
-                        "imagem_url = :imagemUrl WHERE id = :id",
+                "imagem_url = :imagem_url WHERE id = :id",
                 new MapSqlParameterSource()
                         .addValue(CAMPO_ID, Objects.requireNonNull(existente.getId(), MENSAGEM_ID_NAO_NULO).toString())
                         .addValue(CAMPO_NOME, existente.getNome())

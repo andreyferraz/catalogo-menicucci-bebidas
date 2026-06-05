@@ -461,6 +461,21 @@ button { cursor: pointer; }
 .admin-product-form .primary-button,
 .admin-form .primary-button { justify-self: start; }
 
+.admin-search-box { margin: 18px 0 16px; }
+.admin-search-box input {
+  width: 100%;
+  border: 1px solid rgba(154, 100, 25, .24);
+  border-radius: 18px;
+  padding: 14px 16px;
+  background: #fff;
+  color: var(--text);
+  outline: none;
+}
+.admin-search-box input:focus {
+  border-color: var(--gold-600);
+  box-shadow: 0 0 0 4px rgba(213, 172, 98, .18);
+}
+
 .admin-table { display: grid; gap: 10px; }
 .admin-table-row {
   display: grid;

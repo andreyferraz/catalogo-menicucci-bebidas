@@ -95,6 +95,10 @@
                                     <h2>Produtos cadastrados</h2>
                                 </div>
                             </div>
+                            <div class="admin-search-box">
+                                <input id="adminProductSearch" type="search" placeholder="Buscar produto, categoria ou descrição..."
+                                    aria-label="Buscar produto cadastrado" />
+                            </div>
                             <div class="admin-table">
                                 <article class="admin-table-row admin-table-head">
                                     <span>Produto</span>
@@ -102,7 +106,8 @@
                                     <span>Preço</span>
                                     <span>Ações</span>
                                 </article>
-                                <article class="admin-table-row" th:each="produto : ${produtos}">
+                                <article class="admin-table-row" th:each="produto : ${produtos}"
+                                    th:attr="data-search-text=${produto.nome + ' ' + produto.categoria + ' ' + (produto.descricao != null ? produto.descricao : '')}">
                                     <span>
                                         <strong th:text="${produto.nome}">Nome</strong>
                                         <small th:text="${produto.descricao}">Descrição</small>
@@ -169,11 +174,22 @@
             const ADMIN_ACTIVE_TAB_KEY = 'bebidas-menicucci-admin-active-tab';
             const tabs = document.querySelectorAll('[data-admin-tab]');
             const panels = document.querySelectorAll('[data-admin-panel]');
+            const productSearchInput = document.getElementById('adminProductSearch');
+            const productRows = Array.from(document.querySelectorAll('.admin-table-row[data-search-text]'));
 
             function openTab(tabName) {
                 tabs.forEach((tab) => tab.classList.toggle('active', tab.dataset.adminTab === tabName));
                 panels.forEach((panel) => panel.classList.toggle('active', panel.dataset.adminPanel === tabName));
                 localStorage.setItem(ADMIN_ACTIVE_TAB_KEY, tabName);
+            }
+
+            function filterProducts() {
+                const term = (productSearchInput.value || '').trim().toLowerCase();
+
+                productRows.forEach((row) => {
+                    const matches = !term || (row.dataset.searchText || '').toLowerCase().includes(term);
+                    row.style.display = matches ? '' : 'none';
+                });
             }
 
             const savedTab = localStorage.getItem(ADMIN_ACTIVE_TAB_KEY);
@@ -186,6 +202,11 @@
             tabs.forEach((button) => {
                 button.addEventListener('click', () => openTab(button.dataset.adminTab));
             });
+
+            if (productSearchInput) {
+                productSearchInput.addEventListener('input', filterProducts);
+                filterProducts();
+            }
 
             document.querySelectorAll('[data-edit-id]').forEach((button) => {
                 button.addEventListener('click', () => {
