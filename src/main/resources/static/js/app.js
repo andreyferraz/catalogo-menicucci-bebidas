@@ -360,6 +360,11 @@ function showToast(message) {
 }
 
 function init() {
+  const currentYearElement = document.getElementById("copyrightCurrentYear");
+  if (currentYearElement) {
+    currentYearElement.textContent = String(new Date().getFullYear());
+  }
+
   renderCategories();
   renderProducts();
   updateCartUI();

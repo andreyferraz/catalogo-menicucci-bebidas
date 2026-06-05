@@ -85,14 +85,26 @@
 
   <footer class="site-footer">
     <div class="container footer-grid">
-      <div>
+      <div class="footer-brand">
         <strong>Bebidas Menicucci</strong>
         <p>Catálogo online com pedido direcionado para WhatsApp.</p>
+        <small class="footer-legal"><span aria-hidden="true">&copy;</span> <span id="copyrightStartYear">1914</span> - <span id="copyrightCurrentYear">2026</span></small>
       </div>
-      <div class="footer-actions">
-        <a href="https://wa.me/5528988079115" target="_blank" rel="noopener"><span aria-hidden="true">💬</span> 28 98807-9115</a>
-        <a class="admin-login-button" th:href="@{/admin}" sec:authorize="isAuthenticated()">🔐 Painel admin</a>
-        <a class="admin-login-button" th:href="@{/login}" sec:authorize="!isAuthenticated()">🔐 Painel admin</a>
+      <div class="footer-panel">
+        <div class="footer-actions">
+          <a class="footer-chip footer-chip-whatsapp" href="https://wa.me/5528988079115" target="_blank" rel="noopener">
+            <span aria-hidden="true">💬</span>
+            <span>28 98807-9115</span>
+          </a>
+          <a class="footer-chip" href="https://www.andreyferraz.com.br" target="_blank" rel="noopener">
+            <span aria-hidden="true">✦</span>
+            <span>Desenvolvido por Andrêy Ferraz</span>
+          </a>
+        </div>
+        <div class="footer-secondary-actions">
+          <a class="admin-login-button" th:href="@{/admin}" sec:authorize="isAuthenticated()">🔐 Painel admin</a>
+          <a class="admin-login-button" th:href="@{/login}" sec:authorize="!isAuthenticated()">🔐 Painel admin</a>
+        </div>
       </div>
     </div>
   </footer>
