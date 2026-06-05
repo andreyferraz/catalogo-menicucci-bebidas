@@ -43,7 +43,7 @@ public class UsuarioService {
 
         var params = new MapSqlParameterSource().addValue(USERNAME_FIELD, username);
         List<Usuario> usuarios = jdbcTemplate.query(
-                "SELECT id, username, password, role, foto_url FROM usuarios WHERE username = :username",
+            "SELECT id, username, password FROM usuarios WHERE username = :username",
                 params,
                 this::mapUsuario);
         return usuarios.stream().findFirst();
@@ -101,7 +101,7 @@ public class UsuarioService {
                 params);
 
         var out = jdbcTemplate.query(
-                "SELECT id, username, password, role, foto_url FROM usuarios WHERE id = :id",
+            "SELECT id, username, password FROM usuarios WHERE id = :id",
                 new MapSqlParameterSource().addValue("id", id.toString()),
                 this::mapUsuario);
 
