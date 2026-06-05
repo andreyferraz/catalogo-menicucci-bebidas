@@ -1,11 +1,12 @@
 package com.menicucci.catalogo.service;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.StreamSupport;
-import java.util.Objects;
 
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -49,7 +50,12 @@ public class ProdutoService {
                 .toList();
     }
 
-    @Transactional
+    public List<Produto> listarOrdenados() {
+        return listarTodos().stream()
+                .sorted(Comparator.comparing(Produto::getNome, String.CASE_INSENSITIVE_ORDER))
+                .toList();
+    }
+
     public Produto criarProduto(String nome, String descricao, BigDecimal preco, String categoria,
             MultipartFile imagem) {
         ValidationUtils.validarCampoStringObrigatorio(nome, CAMPO_NOME);
@@ -81,32 +87,35 @@ public class ProdutoService {
         return novo;
     }
 
-    @Transactional
     public Produto atualizar(UUID id, String nome, String descricao, String categoria, BigDecimal preco,
             MultipartFile imagem) {
-        ValidationUtils.validarCampoObrigatorio(id, "id");
+        ValidationUtils.validarCampoObrigatorio(id, CAMPO_ID);
 
         Produto existente = produtoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Produto nao encontrado."));
 
-        if (nome != null)
+        if (nome != null) {
             existente.setNome(nome);
-        if (descricao != null)
+        }
+        if (descricao != null) {
             existente.setDescricao(descricao);
-        if (categoria != null)
+        }
+        if (categoria != null) {
             existente.setCategoria(categoria);
-        if (preco != null)
+        }
+        if (preco != null) {
             existente.setPreco(preco);
+        }
 
         if (imagem != null && !imagem.isEmpty()) {
             if (existente.getImagemUrl() != null && !existente.getImagemUrl().isEmpty()) {
                 try {
                     fileUploadService.removerImagem(existente.getImagemUrl());
                 } catch (Exception e) {
-                    /* ignore */ }
+                    /* ignore */
+                }
             }
-            String savedName = fileUploadService.salvarImagem(imagem);
-            existente.setImagemUrl(savedName);
+            existente.setImagemUrl(fileUploadService.salvarImagem(imagem));
         }
 
         namedParameterJdbcTemplate.update(
@@ -114,31 +123,47 @@ public class ProdutoService {
                         "imagem_url = :imagemUrl WHERE id = :id",
                 new MapSqlParameterSource()
                         .addValue(CAMPO_ID, Objects.requireNonNull(existente.getId(), MENSAGEM_ID_NAO_NULO).toString())
-                        .addValue("nome", existente.getNome())
+                        .addValue(CAMPO_NOME, existente.getNome())
                         .addValue(CAMPO_DESCRICAO, existente.getDescricao())
                         .addValue(CAMPO_CATEGORIA, existente.getCategoria())
                         .addValue(CAMPO_PRECO, existente.getPreco())
-                        .addValue("imagemUrl", existente.getImagemUrl()));
+                        .addValue(CAMPO_IMAGEM_URL, existente.getImagemUrl()));
 
         return existente;
     }
 
     @Transactional
+    public Produto salvarProduto(Produto produto, MultipartFile imagem) {
+        ValidationUtils.validarCampoObrigatorio(produto, "produto");
+        ValidationUtils.validarCampoStringObrigatorio(produto.getNome(), CAMPO_NOME);
+        ValidationUtils.validarCampoStringObrigatorio(produto.getCategoria(), CAMPO_CATEGORIA);
+        ValidationUtils.validarCampoObrigatorio(produto.getPreco(), CAMPO_PRECO);
+
+        if (produto.getId() == null) {
+            return criarProduto(produto.getNome(), produto.getDescricao(), produto.getPreco(), produto.getCategoria(),
+                    imagem);
+        }
+
+        return atualizar(produto.getId(), produto.getNome(), produto.getDescricao(), produto.getCategoria(),
+                produto.getPreco(), imagem);
+    }
+
+    @Transactional
     public void deletar(UUID id) {
-        ValidationUtils.validarCampoObrigatorio(id, "id");
+        ValidationUtils.validarCampoObrigatorio(id, CAMPO_ID);
         var opt = produtoRepository.findById(id);
         if (opt.isPresent()) {
-            var p = opt.get();
-            if (p.getImagemUrl() != null && !p.getImagemUrl().isEmpty()) {
+            var produto = opt.get();
+            if (produto.getImagemUrl() != null && !produto.getImagemUrl().isEmpty()) {
                 try {
-                    fileUploadService.removerImagem(p.getImagemUrl());
+                    fileUploadService.removerImagem(produto.getImagemUrl());
                 } catch (Exception e) {
-                    /* ignore */ }
+                    /* ignore */
+                }
             }
         }
         namedParameterJdbcTemplate.update(
                 "DELETE FROM produtos WHERE id = :id",
                 new MapSqlParameterSource().addValue(CAMPO_ID, id.toString()));
     }
-
 }
