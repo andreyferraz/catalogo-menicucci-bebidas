@@ -8,6 +8,7 @@ const products = (window.CATALOGO_PRODUCTS || []).map((product) => ({
   category: product.categoria || "Sem categoria",
   description: product.descricao || "",
   price: Number(product.preco || 0),
+  imageUrl: normalizeImageUrl(product.imagemUrl || product.imagem_url),
   icon: pickProductIcon(product.categoria, product.nome)
 }));
 
@@ -31,6 +32,24 @@ function pickProductIcon(category, name) {
   if (text.includes("refrigerante") || text.includes("suco")) return "🥤";
 
   return "🍾";
+}
+
+function normalizeImageUrl(imageUrl) {
+  if (!imageUrl) return "";
+
+  if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+    return imageUrl;
+  }
+
+  if (imageUrl.startsWith("/")) {
+    return imageUrl;
+  }
+
+  if (imageUrl.startsWith("uploads/")) {
+    return `/${imageUrl}`;
+  }
+
+  return `/uploads/${imageUrl}`;
 }
 
 function loadCart() {
@@ -161,7 +180,9 @@ function renderProducts() {
   productsGrid.innerHTML = filteredProducts.map((product) => `
     <article class="product-card">
       <div class="product-image">
-        <span class="product-icon">${product.icon}</span>
+        ${product.imageUrl
+          ? `<img class="product-photo" src="${product.imageUrl}" alt="${product.name}" />`
+          : `<span class="product-icon">${product.icon}</span>`}
       </div>
       <div class="product-body">
         <span class="product-category">${product.category}</span>
