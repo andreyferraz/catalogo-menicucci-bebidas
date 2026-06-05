@@ -17,6 +17,7 @@
                     </div>
 
                     <div class="admin-topbar-actions">
+                        <a class="primary-button admin-pdf-button" th:href="@{/admin/catalogo/pdf}">Gerar catálogo em PDF</a>
                         <a class="ghost-button admin-link-button" th:href="@{/}">Ver catálogo</a>
                         <form th:action="@{/logout}" method="post">
                             <button class="secondary-button admin-logout-button" type="submit">Sair</button>

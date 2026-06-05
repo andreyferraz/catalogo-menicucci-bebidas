@@ -1,9 +1,14 @@
 package com.menicucci.catalogo.controller;
 
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import java.security.Principal;
 
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.menicucci.catalogo.model.Produto;
 import com.menicucci.catalogo.model.Usuario;
 import com.menicucci.catalogo.service.AppConfigService;
+import com.menicucci.catalogo.service.CatalogPdfService;
 import com.menicucci.catalogo.service.ProdutoService;
 import com.menicucci.catalogo.service.UsuarioService;
 
@@ -30,12 +36,14 @@ public class AdminPageController {
 	private final ProdutoService produtoService;
 	private final UsuarioService usuarioService;
 	private final AppConfigService appConfigService;
+	private final CatalogPdfService catalogPdfService;
 
 	public AdminPageController(ProdutoService produtoService, UsuarioService usuarioService,
-			AppConfigService appConfigService) {
+			AppConfigService appConfigService, CatalogPdfService catalogPdfService) {
 		this.produtoService = produtoService;
 		this.usuarioService = usuarioService;
 		this.appConfigService = appConfigService;
+		this.catalogPdfService = catalogPdfService;
 	}
 
 	@GetMapping
@@ -44,6 +52,21 @@ public class AdminPageController {
 		model.addAttribute("produtoForm", new Produto());
 		model.addAttribute("whatsappNumber", appConfigService.getWhatsappNumber());
 		return "admin";
+	}
+
+	@GetMapping("/catalogo/pdf")
+	public ResponseEntity<byte[]> baixarCatalogoPdf() {
+		byte[] pdf = catalogPdfService.gerarCatalogoPdf(produtoService.listarOrdenados());
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_PDF);
+		headers.setContentDisposition(ContentDisposition.attachment()
+				.filename("catalogo-bebidas-menicucci.pdf", StandardCharsets.UTF_8)
+				.build());
+
+		return ResponseEntity.ok()
+				.headers(headers)
+				.body(pdf);
 	}
 
 	@PostMapping("/senha")
