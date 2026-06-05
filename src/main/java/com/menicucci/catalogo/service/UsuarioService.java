@@ -21,16 +21,14 @@ import com.menicucci.catalogo.utils.ValidationUtils;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
-    private final FileUploadService fileUploadService;
     private final PasswordEncoder passwordEncoder;
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private static final String USERNAME_FIELD = "username";
     private static final String PASSWORD_FIELD = "password";
 
-    public UsuarioService(UsuarioRepository usuarioRepository, FileUploadService fileUploadService,
+    public UsuarioService(UsuarioRepository usuarioRepository,
             PasswordEncoder passwordEncoder, NamedParameterJdbcTemplate jdbcTemplate) {
         this.usuarioRepository = usuarioRepository;
-        this.fileUploadService = fileUploadService;
         this.passwordEncoder = passwordEncoder;
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -89,8 +87,8 @@ public class UsuarioService {
         ValidationUtils.validarCampoObrigatorio(id, "id");
         ValidationUtils.validarCampoStringObrigatorio(novaSenha, "novaSenha");
 
-        Usuario existente = usuarioRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Usuario nao encontrado."));
+        usuarioRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Usuario nao encontrado."));
 
         String hash = passwordEncoder.encode(novaSenha);
 
@@ -102,8 +100,6 @@ public class UsuarioService {
                 "UPDATE usuarios SET password = :password WHERE id = :id",
                 params);
 
-        // reload and return using explicit query to avoid possible repository mapping
-        // issues
         var out = jdbcTemplate.query(
                 "SELECT id, username, password, role, foto_url FROM usuarios WHERE id = :id",
                 new MapSqlParameterSource().addValue("id", id.toString()),
@@ -116,10 +112,6 @@ public class UsuarioService {
     @Transactional
     public void deletar(UUID id) {
         ValidationUtils.validarCampoObrigatorio(id, "id");
-        var opt = usuarioRepository.findById(id);
-        if (opt.isPresent()) {
-            var u = opt.get();
-        }
         usuarioRepository.deleteById(id);
     }
 
