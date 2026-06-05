@@ -2,6 +2,8 @@ package com.menicucci.catalogo.controller;
 
 import java.util.UUID;
 
+import java.security.Principal;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.menicucci.catalogo.model.Produto;
+import com.menicucci.catalogo.model.Usuario;
 import com.menicucci.catalogo.service.AppConfigService;
 import com.menicucci.catalogo.service.ProdutoService;
 import com.menicucci.catalogo.service.UsuarioService;
@@ -44,8 +47,13 @@ public class AdminPageController {
 	}
 
 	@PostMapping("/senha")
-	public String alterarSenha(@RequestParam UUID id, @RequestParam String novaSenha,
+	public String alterarSenha(Principal principal, @RequestParam String novaSenha,
 			RedirectAttributes redirectAttributes) {
+		String username = principal.getName();
+		UUID id = usuarioService.buscarPorUsername(username)
+				.map(Usuario::getId)
+				.orElseThrow(() -> new IllegalStateException("Usuário autenticado não encontrado."));
+
 		usuarioService.atualizarSenha(id, novaSenha);
 		redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE, "Senha alterada com sucesso.");
 		return ADMIN_REDIRECT;
